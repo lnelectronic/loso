@@ -11,10 +11,10 @@ import (
 )
 
 // New Connect
-func NewCon(dbname string) (*LnDatabase, error) {
+func NewCon(host, dbname string) (*LnDatabase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Hostmgo))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(host))
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func NewCon(dbname string) (*LnDatabase, error) {
 	return &LnDatabase{DB: db, Client: client, Context: ctx}, nil
 }
 
-// Close
+// Close Connection
 func (ln *LnDatabase) Close() {
 	ln.Client.Disconnect(ln.Context)
 }
