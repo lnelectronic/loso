@@ -5,19 +5,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"log"
 	"loso/config"
 	"time"
 )
 
 // New connect  for the mongo-go-driver set client.
-func New(dbname string) (*LnDatabase, error) {
+func NewCon(dbname string) (*LnDatabase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.Hostmgo))
 	if err != nil {
 		return nil, err
 	}
-	ctxping, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctxping, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
 	err = client.Ping(ctxping, readpref.Primary())
 	if err != nil {
@@ -32,7 +33,6 @@ func (ln *LnDatabase) Close() {
 	ln.Client.Disconnect(ln.Context)
 }
 
-
 // Database is a wrapper for the mongo-go-driver.
 type LnDatabase struct {
 	DB      *mongo.Database
@@ -40,3 +40,25 @@ type LnDatabase struct {
 	Context context.Context
 }
 
+func Connection() *mongo.Client {
+	// Set client options
+	clientOptions := options.Client().ApplyURI(config.Hostmgo)
+
+	// Connect to MongoDB
+	client, err := mongo.Connect(context.TODO(), clientOptions)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Check the connection
+	err = client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//fmt.Println("Connected to MongoDB!")
+
+	return client
+}

@@ -1,20 +1,15 @@
-package testdb
-
-import (
-	"fmt"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"testing"
-)
-
 package database
 
 import (
-"fmt"
-"github.com/lotteryjs/ten-minutes-app/model"
-"github.com/stretchr/testify/assert"
-"github.com/stretchr/testify/suite"
-"go.mongodb.org/mongo-driver/bson/primitive"
-"testing"
+	"context"
+	"fmt"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"loso/model"
+	"testing"
 )
 
 func TestDatabaseSuite(t *testing.T) {
@@ -23,12 +18,12 @@ func TestDatabaseSuite(t *testing.T) {
 
 type DatabaseSuite struct {
 	suite.Suite
-	db *TenDatabase
+	db *LnDatabase
 }
 
 func (s *DatabaseSuite) BeforeTest(suiteName, testName string) {
 	s.T().Log("--BeforeTest--")
-	db, _ := New("mongodb://root:123456@localhost:27017", "tenapi")
+	db, _ := NewCon("ln-smt")
 	s.db = db
 }
 
@@ -37,7 +32,7 @@ func (s *DatabaseSuite) AfterTest(suiteName, testName string) {
 }
 
 func (s *DatabaseSuite) TestPost() {
-	s.db.DB.Collection("posts").Drop(nil)
+	s.db.DB.Collection("test").Drop(nil)
 
 	var err error
 	for i := 1; i <= 25; i++ {
@@ -53,16 +48,20 @@ func (s *DatabaseSuite) TestPost() {
 	assert.Nil(s.T(), err)
 }
 
-func (s *DatabaseSuite) TestUpdatePost() {
-	id, _ := primitive.ObjectIDFromHex("5c92e6199929adef73bceea1")
-	userID, _ := primitive.ObjectIDFromHex("5c8f9a83da2c3fed4eee9dc1")
-
-	post := &model.Post{
-		ID:     id,
-		UserID: userID,
-		Title:  "title1",
-		Body:   "title1bodytitle1body",
+// CreatePost creates a post.
+func (d *LnDatabase) CreatePost(post *model.Post) *model.Post {
+	// Specifies the order in which to return results.
+	upsert := true
+	result := d.DB.Collection("test").
+		FindOneAndReplace(context.Background(),
+			bson.D{{Key: "_id", Value: post.ID}},
+			post,
+			&options.FindOneAndReplaceOptions{
+				Upsert: &upsert,
+			},
+		)
+	if result != nil {
+		return post
 	}
-
-	assert.Equal(s.T(), post, s.db.UpdatePost(post))
+	return nil
 }
