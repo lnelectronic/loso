@@ -13,7 +13,7 @@ func (m *LnDatabase) InsertUser(user *models.User) (*models.User, error) {
 		context.Background(),
 		user,
 	)
-	fmt.Println(">>>>", result)
+	fmt.Println(">>>>>>>", result)
 	if err != nil {
 		return nil, err
 	}
