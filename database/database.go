@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// New connect  for the mongo-go-driver set client.
+// New Connect
 func NewCon(dbname string) (*LnDatabase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -28,12 +28,12 @@ func NewCon(dbname string) (*LnDatabase, error) {
 	return &LnDatabase{DB: db, Client: client, Context: ctx}, nil
 }
 
-// Close closes the mongo-go-driver connection.
+// Close
 func (ln *LnDatabase) Close() {
 	ln.Client.Disconnect(ln.Context)
 }
 
-// Database is a wrapper for the mongo-go-driver.
+// Database is a wrapper
 type LnDatabase struct {
 	DB      *mongo.Database
 	Client  *mongo.Client
