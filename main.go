@@ -1,31 +1,32 @@
 package main
 
 import (
-	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/gin-gonic/gin"
+	"loso/config"
 	"loso/database"
+	"loso/router/api"
+	"net/http"
 )
 
-func main() {
-	CreatePost()
-
+func test(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"message": "00001",
+	})
 }
+func main() {
 
-// CreatePost creates a post.
-func (d *LnDatabase) CreatePost(post *model.Post) *model.Post {
-	// Specifies the order in which to return results.
-	upsert := true
-	result := d.DB.Collection("user").
-		FindOneAndReplace(context.Background(),
-			bson.D{{Key: "_id", Value: post.ID}},
-			post,
-			&options.FindOneAndReplaceOptions{
-				Upsert: &upsert,
-			},
-		)
-	if result != nil {
-		return post
+	db, err := database.NewCon("ln-smt")
+	if err != nil {
+		panic(err)
 	}
-	return nil
+	defer db.Close()
+
+	Handler := api.UserAPI{DB: db}
+
+	r := gin.Default()
+	r.GET("/ping", test)
+	r.POST("/add", Handler.InsertUser)
+
+	r.Run(config.ServerHost)
+
 }
