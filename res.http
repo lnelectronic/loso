@@ -1,0 +1,16 @@
+### Test
+http://localhost:8080/ping
+
+
+### InsertAdmin
+POST http://localhost:8080/add
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "username":"lnelectronic",
+  "passwd": "dfs564165123",
+  "email":      "ln@gmail.com",
+  "phone": 5465465,
+  "accessLevel":      ["admin"]
+}
