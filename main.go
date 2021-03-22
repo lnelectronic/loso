@@ -15,7 +15,7 @@ func test(c *gin.Context) {
 }
 func main() {
 
-	db, err := database.NewCon("ln-smt")
+	db, err := database.NewCon(config.Hostmgo, "ln-smt")
 	if err != nil {
 		panic(err)
 	}
