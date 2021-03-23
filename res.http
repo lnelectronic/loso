@@ -1,6 +1,9 @@
 ### Test
 http://localhost:8080/ping
 
+### bookable
+http://localhost:8080/bookable
+
 
 ### InsertAdmin
 POST http://localhost:8080/add
