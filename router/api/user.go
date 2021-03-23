@@ -1,8 +1,8 @@
 package api
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"loso/models"
 	"net/http"
 )
@@ -17,18 +17,60 @@ type UserAPI struct {
 	DB UserDatabase
 }
 
+var validate = validator.New()
+
+// InserUser creates a User.
+//func (a *UserAPI) InsertUser(ctx *gin.Context) {
+//	var user = models.User{}
+//	err := ctx.ShouldBindJSON(&user)
+//	if err != nil {
+//		ctx.AbortWithError(http.StatusInternalServerError, errors.New("Error: Check Data insert."))
+//		return
+//	}
+//
+//	err = validate.Struct(&user)
+//	if err != nil {
+//		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+//		return
+//	}
+//
+//	result, err := a.DB.InsertUser(user.New())
+//	if errors.Is(err, sql.ErrNoRows) {
+//		ctx.JSON(http.StatusBadRequest, gin.H{"Error": "Server not found."})
+//		return
+//	}
+//	ctx.JSON(http.StatusOK, result)
+//	return
+//}
+//
+//
+
 // InserUser creates a User.
 func (a *UserAPI) InsertUser(ctx *gin.Context) {
-	var user = models.User{}
-	if err := ctx.ShouldBindJSON(&user); err == nil {
-		result, err := a.DB.InsertUser(user.New())
 
-		if err != nil {
-			ctx.JSON(http.StatusNonAuthoritativeInfo, err)
-		}
-		ctx.JSON(http.StatusOK, result)
-	} else {
-		//ctx.AbortWithError(500, errors.New("LN : Sorry  error"))
-		ctx.AbortWithError(http.StatusInternalServerError, errors.New("LN : Sorry  error"))
+	user := &models.User{}
+	if err := ctx.ShouldBind(user); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
 	}
+
+	if err := validate.Struct(user); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	result, err := a.DB.InsertUser(user.New())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"Error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
+	return
 }
