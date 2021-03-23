@@ -1,6 +1,8 @@
 package api
 
 import (
+	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"loso/models"
@@ -68,6 +70,11 @@ func (a *UserAPI) InsertUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"Error": err.Error(),
 		})
+		return
+	}
+	// Error form database
+	if errors.Is(err, sql.ErrNoRows) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"Error": "Server not found."})
 		return
 	}
 
