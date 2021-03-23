@@ -24,11 +24,11 @@ func (a *UserAPI) InsertUser(ctx *gin.Context) {
 		result, err := a.DB.InsertUser(user.New())
 
 		if err != nil {
-			ctx.JSON(http.StatusOK, err)
+			ctx.JSON(http.StatusNonAuthoritativeInfo, err)
 		}
-		ctx.JSON(200, result)
+		ctx.JSON(http.StatusOK, result)
 	} else {
 		//ctx.AbortWithError(500, errors.New("LN : Sorry  error"))
-		ctx.AbortWithError(http.StatusBadRequest, errors.New("LN : Sorry  error"))
+		ctx.AbortWithError(http.StatusInternalServerError, errors.New("LN : Sorry  error"))
 	}
 }
