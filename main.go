@@ -25,7 +25,10 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/ping", test)
+	r.POST("/getuserid", Handler.GetUserByIDs)
 	r.POST("/add", Handler.InsertUser)
+	r.GET("/getalluser", Handler.GetUsers)
+	r.POST("/getuserbyusername", Handler.GetUserByUserbame)
 
 	r.Run(config.ServerHost)
 
