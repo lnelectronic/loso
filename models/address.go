@@ -1,3 +1,8 @@
+// ---------------------------------------------------------------------------
+// LN-ELECTRINIC PROJECT LN-16C10R
+// wwww.ln-electronic.com  ProjectManager : @JJOY, @Kimera
+// FileData: 24/3/2564 21:13
+// ---------------------------------------------------------------------------
 package models
 
 import "go.mongodb.org/mongo-driver/bson/primitive"
