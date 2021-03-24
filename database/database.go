@@ -5,12 +5,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"log"
-	"loso/config"
 	"time"
 )
 
-// New Connect
+// New Connect database
 func NewCon(host, dbname string) (*LnDatabase, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -38,27 +36,4 @@ type LnDatabase struct {
 	DB      *mongo.Database
 	Client  *mongo.Client
 	Context context.Context
-}
-
-func Connection() *mongo.Client {
-	// Set client options
-	clientOptions := options.Client().ApplyURI(config.Hostmgo)
-
-	// Connect to MongoDB
-	client, err := mongo.Connect(context.TODO(), clientOptions)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Check the connection
-	err = client.Ping(context.TODO(), nil)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//fmt.Println("Connected to MongoDB!")
-
-	return client
 }
