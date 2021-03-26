@@ -11,19 +11,6 @@ import (
 	"net/http"
 )
 
-// ---------------------------------------------------------------------------
-// LN-ELECTRINIC PROJECT LN-16C10R
-// wwww.ln-electronic.com  ProjectManager : @JJOY, @Kimera
-// FileData: 26/3/2564 14:52
-// ---------------------------------------------------------------------------
-package apperrors
-
-import (
-"errors"
-"fmt"
-"net/http"
-)
-
 // Type holds a type string and integer code for the error
 type Type string
 
@@ -158,5 +145,3 @@ func NewUnsupportedMediaType(reason string) *Error {
 		Message: reason,
 	}
 }
-
-
