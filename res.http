@@ -13,7 +13,7 @@ Content-Type: application/json
 {
   "username":"lnelectronic",
   "passwd": "dfs564165123",
-  "email":      "ln@gmail.com",
+  "email":      "lngmail.com",
   "phone": 5465465,
   "accessLevel":      ["admin"]
 }

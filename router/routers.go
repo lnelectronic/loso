@@ -44,11 +44,11 @@ func InitGin(db *database.LnDatabase) *gin.Engine {
 
 	u := g.Group("/user")
 	{
-		u.POST("", userHandler.GetUsers)
-		//u.GET("/ping", test)
+		//u.POST("", userHandler.GetUsers)
+		//u.GET("/get", gga.Get)
 		u.POST("/getbyid", userHandler.GetUserByIDs)
 		u.POST("/insert", userHandler.InsertUser)
-		//u.GET("getuser", userHandler.GetUsers)
+		u.GET("getuser", userHandler.GetUsers)
 		u.POST("/getbyname", userHandler.GetUserByUserbame)
 	}
 

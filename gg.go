@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"loso/config"
 	"loso/database"
 )
 
-var CNX = database.Connection()
-var Conn, _ = database.NewCon("ln-smt")
+//var CNX = database.Connection()
+var Conn, _ = database.NewCon(config.Hostmgo, "ln-smt")
 
 type Trainer struct {
 	Name string
