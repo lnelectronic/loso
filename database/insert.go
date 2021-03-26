@@ -37,15 +37,15 @@ func (ln *LnDatabase) GetUserByName(name string) *models.User {
 }
 
 // GetUsers returns all users.
-// start, end int, order, sort string
-func (ln *LnDatabase) GetUsers(paging *models.Filter) []*models.User {
+// Filter start, end int, order, sort string
+func (ln *LnDatabase) GetUsers(fil *models.Filter) []*models.User {
 	users := []*models.User{}
 	cursor, err := ln.DB.Collection("test").
 		Find(context.Background(), bson.D{},
 			&options.FindOptions{
-				Skip:  paging.Skip,
-				Sort:  bson.D{bson.E{Key: paging.SortKey, Value: paging.SortVal}},
-				Limit: paging.Limit,
+				Skip:  fil.Skip,
+				Sort:  bson.D{bson.E{Key: fil.SortKey, Value: fil.SortVal}},
+				Limit: fil.Limit,
 			})
 	if err != nil {
 		return nil

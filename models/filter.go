@@ -13,3 +13,15 @@ type Filter struct {
 	SortVal   int
 	Condition interface{}
 }
+
+//New Instance Farm
+func (f *Filter) New() *Filter {
+	return &Filter{
+
+		Skip:      f.Skip,
+		Limit:     f.Limit,
+		SortKey:   f.SortKey,
+		SortVal:   f.SortVal,
+		Condition: f.Condition,
+	}
+}

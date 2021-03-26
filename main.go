@@ -2,9 +2,10 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"loso/config"
 	"loso/database"
-	"loso/router/api"
+	"loso/router"
 	"net/http"
 )
 
@@ -18,18 +19,13 @@ func main() {
 	db, err := database.NewCon(config.Hostmgo, "ln-smt")
 	if err != nil {
 		panic(err)
+	} else {
+		log.Println("LN-ELECTRONIC Project SmartFarm")
+		log.Println("Server MongoDb: Active...")
 	}
 	defer db.Close()
 
-	Handler := api.UserAPI{DB: db}
-
-	r := gin.Default()
-	r.GET("/ping", test)
-	r.POST("/getuserid", Handler.GetUserByIDs)
-	r.POST("/add", Handler.InsertUser)
-	r.GET("/getalluser", Handler.GetUsers)
-	r.POST("/getuserbyusername", Handler.GetUserByUserbame)
-
+	r := router.InitGin(db)
 	r.Run(config.ServerHost)
 
 }

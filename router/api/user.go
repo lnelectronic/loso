@@ -79,6 +79,7 @@ func (a *UserAPI) GetUserByUserbame(c *gin.Context) {
 // GetUsers returns all users
 // _end=5&_order=DESC&_sort=id&_start=0 adapt react-admin
 func (a *UserAPI) GetUsers(ctx *gin.Context) {
+
 	var (
 		start int64
 		end   int64
@@ -90,8 +91,8 @@ func (a *UserAPI) GetUsers(ctx *gin.Context) {
 		a.GetUserByIDs(ctx)
 		return
 	}
-	start, _ = strconv.ParseInt(ctx.DefaultQuery("_start", "0"), 10, 64)
-	end, _ = strconv.ParseInt(ctx.DefaultQuery("_end", "10"), 10, 64)
+	start, _ = strconv.ParseInt(ctx.DefaultQuery("_skip", "0"), 10, 64)
+	end, _ = strconv.ParseInt(ctx.DefaultQuery("_limit", "10"), 10, 64)
 	sort = ctx.DefaultQuery("_sort", "_id")
 	order = 1
 
@@ -102,8 +103,13 @@ func (a *UserAPI) GetUsers(ctx *gin.Context) {
 	if ctx.DefaultQuery("_order", "DESC") == "DESC" {
 		order = -1
 	}
+	if ctx.Query("_order") == "-1" {
+		order = -1
+	}
 
 	limit := end - start
+
+	// now instance param
 	users := a.DB.GetUsers(
 		&models.Filter{
 			Skip:      &start,
@@ -114,5 +120,5 @@ func (a *UserAPI) GetUsers(ctx *gin.Context) {
 		})
 
 	ctx.Header("Doc-Count ", a.DB.CountUser())
-	ctx.JSON(200, users)
+	ctx.JSON(http.StatusOK, users)
 }
