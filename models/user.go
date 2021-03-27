@@ -5,7 +5,9 @@
 // ---------------------------------------------------------------------------
 package models
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // user insert
 type User struct {
@@ -15,6 +17,7 @@ type User struct {
 	Email       string             `bson:"email" json:"email" validate:"required,email"`
 	Phone       int64              `bson:"phone" json:"phone" validate:"required"`
 	AccessLevel []string           `bson:"accessLevel" json:"accessLevel" validate:"required"`
+	DataJoin    primitive.DateTime
 }
 
 // New is an instance
@@ -26,6 +29,7 @@ func (u *User) New() *User {
 		Email:       u.Email,
 		Phone:       u.Phone,
 		AccessLevel: u.AccessLevel,
+		DataJoin:    u.DataJoin,
 	}
 }
 

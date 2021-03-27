@@ -2,12 +2,17 @@ package database
 
 import (
 	"context"
+	"encoding/hex"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/scrypt"
+	"log"
 	"loso/models"
+	"loso/models/apperrors"
 	"strconv"
+	"strings"
 )
 
 // InserUser creates new user.
@@ -97,4 +102,57 @@ func (ln *LnDatabase) GetUserByIDs(ids []primitive.ObjectID) []*models.User {
 	}
 
 	return users
+}
+
+// FindByUser returns the username.
+func (ln *LnDatabase) FindByUser(username string) (*models.User, error) {
+	var user *models.User
+	err := ln.DB.Collection("test").
+		FindOne(context.Background(), bson.D{{Key: "username", Value: username}}).
+		Decode(&user)
+	if err != nil {
+		log.Printf("Unable to get user with email address: %v. Err: %v\n", username, err)
+		return user, apperrors.NewNotFound("username", username)
+
+	}
+	return user, err
+}
+
+func (ln *LnDatabase) CheckSignin(ctx context.Context, u *models.User) error {
+	uFetched, err := ln.FindByUser(u.Username)
+
+	// Will return NotAuthorized to client to omit details of why
+	if err != nil {
+		return apperrors.NewAuthorization("Invalid email and password combination")
+	}
+
+	// verify password - we previously created this method
+	match, err := comparePasswords(uFetched.Passwd, u.Passwd)
+
+	if err != nil {
+		return apperrors.NewInternal()
+	}
+
+	if !match {
+		return apperrors.NewAuthorization("Invalid email and password combination")
+	}
+
+	*u = *uFetched
+	return nil
+}
+
+func comparePasswords(storedPassword string, suppliedPassword string) (bool, error) {
+	pwsalt := strings.Split(storedPassword, ".")
+
+	// check supplied password salted with hash
+	salt, err := hex.DecodeString(pwsalt[1])
+
+	if err != nil {
+		return false, fmt.Errorf("Unable to verify user password")
+	}
+
+	shash, err := scrypt.Key([]byte(suppliedPassword), salt, 32768, 8, 1, 32)
+	pddws := hex.EncodeToString(shash) == pwsalt[0]
+	log.Println("Decode:", pddws)
+	return hex.EncodeToString(shash) == pwsalt[0], nil
 }

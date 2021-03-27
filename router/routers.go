@@ -42,15 +42,28 @@ func InitGin(db *database.LnDatabase) *gin.Engine {
 
 	userHandler := api.UserAPI{DB: db}
 
-	u := g.Group("/user")
+	u := g.Group("/users")
 	{
 		//u.POST("", userHandler.GetUsers)
 		//u.GET("/get", gga.Get)
 		u.POST("/getbyid", userHandler.GetUserByIDs)
-		u.POST("/insert", userHandler.InsertUser)
+		u.POST("/signup", userHandler.InsertUser)
 		u.GET("getuser", userHandler.GetUsers)
 		u.POST("/getbyname", userHandler.GetUserByUserbame)
 	}
+	g.POST("/signin", userHandler.Signing)
+
+	g.GET("/user/:name/*action", func(c *gin.Context) {
+		name := c.Param("name")
+		action := c.Param("action")
+		message := name + " is " + action
+		c.String(http.StatusOK, message)
+	})
+
+	g.GET("/user/:name", func(c *gin.Context) {
+		name := c.Param("name")
+		c.String(http.StatusOK, "Hello %s", name)
+	})
 
 	log.Println("Gin Engin: Active...")
 
