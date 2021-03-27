@@ -25,7 +25,7 @@ type UserDatabase interface {
 	GetUsers(paging *models.Filter) []*models.User
 	CountUser() string
 	GetUserByName(name string) *models.User
-	Signin(c *gin.Context)
+	//Signin(c *gin.Context)
 	//FindByUser(username string) (*models.User,error)
 	CheckSignin(ctx context.Context, u *models.User) error
 }

@@ -51,7 +51,7 @@ func InitGin(db *database.LnDatabase) *gin.Engine {
 		u.GET("getuser", userHandler.GetUsers)
 		u.POST("/getbyname", userHandler.GetUserByUserbame)
 	}
-	g.POST("/signin", userHandler.Signing)
+	//g.POST("/signin", userHandler.Signing)
 
 	g.GET("/user/:name/*action", func(c *gin.Context) {
 		name := c.Param("name")
