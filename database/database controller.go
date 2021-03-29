@@ -127,14 +127,14 @@ func (ln *LnDatabase) FindByUser(username string) (*models.User, error) {
 
 //Check User Login
 func (ln *LnDatabase) CheckLogin(ctx context.Context, u *models.User) error {
-	uFetched, err := ln.FindByUser(u.Username)
+	uGet, err := ln.FindByUser(u.Username)
 	//  return  details err
 	if err != nil {
 		return apperrors.NewAuthorization("username or passowrd is incorrect.")
 	}
 
 	// verify password - we previously created this method
-	match, err := comparePassword(uFetched.Passwd, u.Passwd)
+	match, err := comparePassword(uGet.Passwd, u.Passwd)
 
 	if err != nil {
 		return apperrors.NewInternal()
@@ -144,7 +144,7 @@ func (ln *LnDatabase) CheckLogin(ctx context.Context, u *models.User) error {
 		return apperrors.NewAuthorization("Invalid Username or password.")
 	}
 
-	*u = *uFetched
+	*u = *uGet
 	return nil
 }
 
