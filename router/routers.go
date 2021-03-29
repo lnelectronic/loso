@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"loso/database"
+
 	"loso/router/api"
 	"net/http"
 	"os"
@@ -48,17 +49,10 @@ func InitGin(db *database.LnDatabase) *gin.Engine {
 		//u.GET("/get", gga.Get)
 		u.POST("/getbyid", userHandler.GetUserByIDs)
 		u.POST("/signup", userHandler.InsertUser)
-		u.GET("getuser", userHandler.GetUsers)
+		u.GET("/getuser", userHandler.GetUsers)
 		u.POST("/getbyname", userHandler.GetUserByUserbame)
 	}
-	//g.POST("/signin", userHandler.Signing)
-
-	g.GET("/user/:name/*action", func(c *gin.Context) {
-		name := c.Param("name")
-		action := c.Param("action")
-		message := name + " is " + action
-		c.String(http.StatusOK, message)
-	})
+	g.POST("/signin", userHandler.Login)
 
 	g.GET("/user/:name", func(c *gin.Context) {
 		name := c.Param("name")

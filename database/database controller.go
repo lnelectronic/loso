@@ -1,3 +1,8 @@
+// ---------------------------------------------------------------------------
+// LN-ELECTRINIC PROJECT LN-16C10R
+// wwww.ln-electronic.com  ProjectManager : @JJOY, @Kimera
+// FileData: 29/3/2564 11:33
+// ---------------------------------------------------------------------------
 package database
 
 import (
@@ -18,6 +23,7 @@ import (
 // InserUser creates new user.
 func (ln *LnDatabase) InsertUser(user *models.User) (*models.User, error) {
 	// Specifies the order in which to return results.
+	log.Println("binsert:", user.Passwd)
 	result, err := ln.DB.Collection("test").InsertOne(
 		context.Background(),
 		user,
@@ -111,48 +117,46 @@ func (ln *LnDatabase) FindByUser(username string) (*models.User, error) {
 		FindOne(context.Background(), bson.D{{Key: "username", Value: username}}).
 		Decode(&user)
 	if err != nil {
-		log.Printf("Unable to get user with email address: %v. Err: %v\n", username, err)
-		return user, apperrors.NewNotFound("username", username)
+		log.Printf("Unable to get user with username : %v. Err: %v\n", username, err)
+		return nil, apperrors.NewNotFound("username", username)
+		//return nil, err
 
 	}
 	return user, err
 }
 
-func (ln *LnDatabase) CheckSignin(ctx context.Context, u *models.User) error {
+//Check User Login
+func (ln *LnDatabase) CheckLogin(ctx context.Context, u *models.User) error {
 	uFetched, err := ln.FindByUser(u.Username)
-
-	// Will return NotAuthorized to client to omit details of why
+	//  return  details err
 	if err != nil {
-		return apperrors.NewAuthorization("Invalid email and password combination")
+		return apperrors.NewAuthorization("username or passowrd is incorrect.")
 	}
 
 	// verify password - we previously created this method
-	match, err := comparePasswords(uFetched.Passwd, u.Passwd)
+	match, err := comparePassword(uFetched.Passwd, u.Passwd)
 
 	if err != nil {
 		return apperrors.NewInternal()
 	}
 
 	if !match {
-		return apperrors.NewAuthorization("Invalid email and password combination")
+		return apperrors.NewAuthorization("Invalid Username or password.")
 	}
 
 	*u = *uFetched
 	return nil
 }
 
-func comparePasswords(storedPassword string, suppliedPassword string) (bool, error) {
+func comparePassword(storedPassword string, suppliedPassword string) (bool, error) {
 	pwsalt := strings.Split(storedPassword, ".")
 
-	// check supplied password salted with hash
+	// check supplied password by kimera v1.3 @SHA256
 	salt, err := hex.DecodeString(pwsalt[1])
-
 	if err != nil {
 		return false, fmt.Errorf("Unable to verify user password")
 	}
-
 	shash, err := scrypt.Key([]byte(suppliedPassword), salt, 32768, 8, 1, 32)
-	pddws := hex.EncodeToString(shash) == pwsalt[0]
-	log.Println("Decode:", pddws)
+
 	return hex.EncodeToString(shash) == pwsalt[0], nil
 }

@@ -14,7 +14,7 @@ import (
 // Type holds a type string and integer code for the error
 type Type string
 
-// "Set" of valid errorTypes
+// "Set" of valid errorTypes @Kimera V1.1
 const (
 	Authorization        Type = "AUTHORIZATION"          // Authentication Failures -
 	BadRequest           Type = "BAD_REQUEST"            // Validation errors / BadInput
@@ -79,10 +79,10 @@ func Status(err error) int {
 }
 
 /*
-* Error "Factories"
+* Error Easy use by Kimera v1.6
  */
 
-// NewAuthorization to create a 401
+// NewAuthorization Error 401
 func NewAuthorization(reason string) *Error {
 	return &Error{
 		Type:    Authorization,
@@ -90,7 +90,7 @@ func NewAuthorization(reason string) *Error {
 	}
 }
 
-// NewBadRequest to create 400 errors (validation, for example)
+// NewBadRequest Error 400 (validation,)
 func NewBadRequest(reason string) *Error {
 	return &Error{
 		Type:    BadRequest,
@@ -98,7 +98,7 @@ func NewBadRequest(reason string) *Error {
 	}
 }
 
-// NewConflict to create an error for 409
+// NewConflict Error 409
 func NewConflict(name string, value string) *Error {
 	return &Error{
 		Type:    Conflict,
@@ -106,7 +106,7 @@ func NewConflict(name string, value string) *Error {
 	}
 }
 
-// NewInternal for 500 errors and unknown errors
+// NewInternal Error 500
 func NewInternal() *Error {
 	return &Error{
 		Type:    Internal,
@@ -114,7 +114,7 @@ func NewInternal() *Error {
 	}
 }
 
-// NewNotFound to create an error for 404
+// Not Found  404
 func NewNotFound(name string, value string) *Error {
 	return &Error{
 		Type:    NotFound,
@@ -122,7 +122,7 @@ func NewNotFound(name string, value string) *Error {
 	}
 }
 
-// NewPayloadTooLarge to create an error for 413
+// error 413
 func NewPayloadTooLarge(maxBodySize int64, contentLength int64) *Error {
 	return &Error{
 		Type:    PayloadTooLarge,
@@ -130,7 +130,7 @@ func NewPayloadTooLarge(maxBodySize int64, contentLength int64) *Error {
 	}
 }
 
-// NewServiceUnavailable to create an error for 503
+// error 503
 func NewServiceUnavailable() *Error {
 	return &Error{
 		Type:    ServiceUnavailable,
@@ -138,7 +138,7 @@ func NewServiceUnavailable() *Error {
 	}
 }
 
-// NewUnsupportedMediaType to create an error for 415
+//  error 415
 func NewUnsupportedMediaType(reason string) *Error {
 	return &Error{
 		Type:    UnsupportedMediaType,

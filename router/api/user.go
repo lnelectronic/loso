@@ -1,14 +1,16 @@
 package api
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"golang.org/x/net/context"
 	"log"
 	"loso/models"
+	"loso/models/apperrors"
+
 	"net/http"
 	"strconv"
 )
@@ -16,6 +18,7 @@ import (
 // UserApi provides handlers for managing user ln01
 type UserAPI struct {
 	DB UserDatabase
+	CO UserContoller
 }
 
 // UserDatabase interface for encapsulating database access.
@@ -25,15 +28,14 @@ type UserDatabase interface {
 	GetUsers(paging *models.Filter) []*models.User
 	CountUser() string
 	GetUserByName(name string) *models.User
-	//Signin(c *gin.Context)
-	//FindByUser(username string) (*models.User,error)
-	CheckSignin(ctx context.Context, u *models.User) error
+	CheckLogin(ctx context.Context, u *models.User) error
 }
 
-// UserRepository defines methods the service layer expects
-// any repository it interacts with to implement
-type UserRepository interface {
+// any test
+type UserContoller interface {
+	//FindByUser(username string) (*models.User, error)
 	FindByUser(username string) (*models.User, error)
+	GetUserByIDs(ids []primitive.ObjectID) []*models.User
 }
 
 var validate = validator.New()
@@ -42,15 +44,16 @@ var validate = validator.New()
 func (a *UserAPI) InsertUser(ctx *gin.Context) {
 
 	user := &models.User{}
-	var pd, _ = hashPassword(user.Passwd)
+	log.Println("passnobine:", user.Passwd)
 
-	log.Println(pd)
 	if err := ctx.ShouldBind(user); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"Error": err.Error(),
 		})
 		return
 	}
+	var pd, _ = hashPassword(user.Passwd)
+	log.Println("printPD", pd)
 
 	if err := validate.Struct(user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -59,6 +62,8 @@ func (a *UserAPI) InsertUser(ctx *gin.Context) {
 		return
 	}
 	user.Passwd = pd
+
+	log.Println("passAfterbind:", user.Passwd)
 
 	result, err := a.DB.InsertUser(user.New())
 	if err != nil {
@@ -87,6 +92,8 @@ func (a *UserAPI) GetUserByIDs(ctx *gin.Context) {
 //GetUserByName
 func (a *UserAPI) GetUserByUserbame(c *gin.Context) {
 	username := c.Query("username")
+
+	//a.CO.FindByUser(username)
 
 	c.JSON(http.StatusOK, a.DB.GetUserByName(username))
 }
@@ -136,6 +143,35 @@ func (a *UserAPI) GetUsers(ctx *gin.Context) {
 
 	ctx.Header("Doc-Count ", a.DB.CountUser())
 	ctx.JSON(http.StatusOK, users)
+}
+
+// Signin used to authenticate extant user
+func (h *UserAPI) Login(c *gin.Context) {
+	var req signinReq
+
+	if ok := bindData(c, &req); !ok {
+		return
+	}
+
+	u := &models.User{
+		Username: req.Username,
+		Passwd:   req.Passwd,
+	}
+
+	ctx := c.Request.Context()
+	err := h.DB.CheckLogin(ctx, u)
+
+	if err != nil {
+		//log.Printf("Failed to sign in user: %v\n", err.Error())
+		c.JSON(apperrors.Status(err), gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"Login": "Login success. Don't forget make full func",
+	})
 }
 
 //// Signing used to authenticate extant user
